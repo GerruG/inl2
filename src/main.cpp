@@ -5,17 +5,17 @@
 #define LED_DDR     DDRD // Define the data direction register for the LED
 #define LED_PORT    PORTD // Define the port for the LED
 
-// Function to initialize the LED pin
 void init_led() {
     LED_DDR |= (1 << LED_PIN); // Set LED pin as an output
 }
-
-
-// Function to initialize TIMER1
 void init_timer1() {
     TCCR1A = 0; // Set timer to normal mode
     TCCR1B = (1 << WGM12) | (1 << CS12); // Configure for CTC mode and prescaler of 256
-    OCR1A = 12499; // Set output compare register for 200ms intervals (assuming 16MHz clock)
+    OCR1A = 12499; // Set output compare register for 200 ms intervals
+    // Calculation: OCR1A = (Clock Frequency / (Prescaler * Target Frequency)) - 1
+    //              = (16 MHz / (256 * 5 Hz)) - 1
+    //              = 12499
+    // This setting results in a timer frequency of 5 Hz, or a period of 200 ms.
     TIMSK1 |= (1 << OCIE1A); // Enable timer compare interrupt A
 }
 
