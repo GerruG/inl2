@@ -10,7 +10,7 @@ void init_led() {
     LED_DDR |= (1 << LED_PIN); // Set LED pin as an output
 }
 
-// Function to initialize TIMER1
+
 // Function to initialize TIMER1
 void init_timer1() {
     TCCR1A = 0; // Set timer to normal mode
