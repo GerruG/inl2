@@ -15,6 +15,11 @@
 #define LED_PORT    PORTD
 #define TIMER_INTERVAL_MS 10   // Interval for the timer interrupt in milliseconds
 
+#define ADC_MAX_VALUE 1023
+#define SYSTEM_VOLTAGE 5.0
+#define PRINT_INTERVAL 100
+#define BUFFER_SIZE 60
+
 void USART_Init(unsigned int ubrr) {
     UBRR0H = (unsigned char)(ubrr >> 8);
     UBRR0L = (unsigned char)ubrr;
@@ -62,28 +67,10 @@ ISR(TIMER1_COMPA_vect) {
     static uint16_t toggle_count = 0;
     static uint16_t print_count = 0;
     uint16_t adc_result = read_adc(0);
-    voltage = adc_result * 5.0 / 1023.0;
+    voltage = adc_result * SYSTEM_VOLTAGE / ADC_MAX_VALUE;
 
-    toggle_count++;
-    print_count++;
-
-    if (voltage >= 5.0) {
-        if (toggle_count >= 10) {
-            LED_PORT ^= (1 << LED_PIN);
-            toggle_count = 0;
-        }
-    } else if (voltage < 0.1) {
-        LED_PORT |= (1 << LED_PIN);
-    } else {
-        uint16_t max_toggle = 10 * (5.0 - voltage);
-        if (toggle_count >= max_toggle) {
-            LED_PORT ^= (1 << LED_PIN);
-            toggle_count = 0;
-        }
-    }
-
-    if (print_count >= 100) {
-        char buffer[60]; // Ensure buffer is large enough
+    if (print_count >= PRINT_INTERVAL) {
+        char buffer[BUFFER_SIZE]; // Ensure buffer is large enough
         char voltage_str[10];
         dtostrf(voltage, 6, 2, voltage_str);
         sprintf(buffer, "ADC Value: %u, Voltage: %sV\n", adc_result, voltage_str);
